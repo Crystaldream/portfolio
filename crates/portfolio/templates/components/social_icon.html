@@ -1,0 +1,16 @@
+{% match link.platform.as_str() %}
+{% when "github" %}
+<svg class="icon" aria-hidden="true"><use href="/static/icons/icons.svg#icon-github"></use></svg>
+{% when "linkedin" %}
+<svg class="icon" aria-hidden="true"><use href="/static/icons/icons.svg#icon-linkedin"></use></svg>
+{% when "twitter" %}
+<svg class="icon" aria-hidden="true"><use href="/static/icons/icons.svg#icon-twitter"></use></svg>
+{% when "mail" %}
+<svg class="icon" aria-hidden="true"><use href="/static/icons/icons.svg#icon-envelope"></use></svg>
+{% when "website" %}
+<svg class="icon" aria-hidden="true"><use href="/static/icons/icons.svg#icon-globe"></use></svg>
+{% when "rss" %}
+<svg class="icon" aria-hidden="true"><use href="/static/icons/icons.svg#icon-rss"></use></svg>
+{% else %}
+<svg class="icon" aria-hidden="true"><use href="/static/icons/icons.svg#icon-link"></use></svg>
+{% endmatch %}

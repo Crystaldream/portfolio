@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.title }} | {{ site.author }}{% endblock %}
+{% block nav_projects %}nav__link--active{% endblock %}
+
+{% block styles %}{{ css|safe }}{% endblock %}
+
+{% block content %}
+<div class="page page--project">
+
+    <nav class="breadcrumb" aria-label="Breadcrumb" data-reveal>
+        <a href="/projects" class="breadcrumb__link">
+            <svg class="icon" aria-hidden="true"><use href="/static/icons/icons.svg#icon-arrow-left"></use></svg>
+            Back to Projects
+        </a>
+    </nav>
+    
+    <header class="project-header" data-reveal data-reveal-delay="100">
+        <h1 class="project-header__title">{{ project.title }}</h1>
+        <p class="project-header__description">{{ project.description }}</p>
+        
+        <div class="project-header__meta">
+            <div class="project-header__tech">
+                {% for tech in project.tech_stack %}
+                <span class="tag tag--large">{{ tech }}</span>
+                {% endfor %}
+            </div>
+            
+            <div class="project-header__links">
+                {% if project.url.is_some() %}
+                <a href="{{ project.url.as_ref().unwrap() }}" class="button button--primary" target="_blank" rel="noopener noreferrer">
+                    <svg class="icon" aria-hidden="true"><use href="/static/icons/icons.svg#icon-arrow-up-right-from-square"></use></svg>
+                    View Live
+                </a>
+                {% endif %}
+                
+                {% if project.github_url.is_some() %}
+                <a href="{{ project.github_url.as_ref().unwrap() }}" class="button button--secondary" target="_blank" rel="noopener noreferrer">
+                    <svg class="icon" aria-hidden="true"><use href="/static/icons/icons.svg#icon-github"></use></svg>
+                    View Source
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+    
+    {% if project.image_url.is_some() %}
+    <figure class="project-image" data-reveal data-reveal-delay="200">
+        <img src="{{ project.image_url.as_ref().unwrap() }}" alt="{{ project.title }} screenshot" loading="lazy">
+    </figure>
+    {% endif %}
+    
+    <article class="project-content prose" data-reveal data-reveal-delay="300">
+        {{ project.content_html|safe }}
+    </article>
+    
+    <footer class="project-footer" data-reveal>
+        <div class="project-footer__nav">
+            <a href="/projects" class="button button--ghost">
+                <svg class="icon" aria-hidden="true"><use href="/static/icons/icons.svg#icon-arrow-left"></use></svg>
+                All Projects
+            </a>
+        </div>
+    </footer>
+</div>
+{% endblock %}

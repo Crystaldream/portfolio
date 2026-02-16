@@ -1,0 +1,89 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/shared",
+    "crates/portfolio",
+    "crates/wasm_components",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Telmo Reinas <telmo.reinas@gmail.com>"]
+license = "MIT"
+
+[workspace.dependencies]
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# Web framework
+axum = { version = "0.8", features = ["macros"] }
+tower = { version = "0.5", features = ["timeout", "limit"] }
+tower-http = { version = "0.6", features = ["cors", "fs", "compression-gzip", "trace", "set-header"] }
+
+# Templating
+askama = { version = "0.14" }
+
+# Database
+surrealdb = { version = "2.4.0", features = ["protocol-http"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Markdown processing
+pulldown-cmark = { version = "0.12", features = ["simd"] }
+syntect = "5"
+
+# Error handling
+thiserror = "2"
+anyhow = "1"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "time"] }
+
+# HTTP client (for webhooks)
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+
+# Configuration
+dotenvy = "0.15"
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }
+
+# Validation
+validator = { version = "0.19", features = ["derive"] }
+
+# WASM
+wasm-bindgen = "0.2"
+web-sys = { version = "0.3", features = [
+    "Window",
+    "Document",
+    "Element",
+    "HtmlElement",
+    "CssStyleDeclaration",
+    "DomRect",
+    "DomTokenList",
+    "IntersectionObserver",
+    "IntersectionObserverEntry",
+    "IntersectionObserverInit",
+    "MouseEvent",
+    "MediaQueryList",
+    "Storage",
+    "NodeList",
+    "Event",
+    "EventTarget",
+] }
+js-sys = "0.3"
+
+[profile.release]
+strip = true
+panic = "abort"
+
+[profile.dev]
+opt-level = 0
+
+[profile.wasm-release]
+inherits = "release"
+opt-level = "s"

@@ -1,0 +1,34 @@
+{% for post in posts %}
+<article class="post-item" data-reveal>
+    <div class="post-item__meta">
+        <time datetime="{{ post.created_at }}">
+            {{ post.created_at.format("%B %d, %Y") }}
+        </time>
+        <span class="post-item__separator">·</span>
+        <span class="post-item__reading-time">{{ post.reading_time }} min read</span>
+    </div>
+    
+    <h3 class="post-item__title">
+        <a href="/blog/{{ post.slug }}">{{ post.title }}</a>
+    </h3>
+    
+    <p class="post-item__excerpt">{{ post.excerpt }}</p>
+    
+    <div class="post-item__tags">
+        {% for tag in post.tags %}
+        <span class="tag tag--small">{{ tag }}</span>
+        {% endfor %}
+    </div>
+    
+    <a href="/blog/{{ post.slug }}" class="post-item__link">
+        Read More
+        <svg class="icon" aria-hidden="true"><use href="/static/icons/icons.svg#icon-arrow-right"></use></svg>
+    </a>
+</article>
+{% endfor %}
+
+{% if posts.is_empty() %}
+<div class="empty-state">
+    <p>No posts found with this filter.</p>
+</div>
+{% endif %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found | {{ site.title }}{% endblock %}
+
+{% block styles %}{{ css|safe }}{% endblock %}
+
+{% block content %}
+<div class="page page--error">
+
+    <div class="error-page">
+        <h1 class="error-page__code">404</h1>
+        <h2 class="error-page__title">Page Not Found</h2>
+        <p class="error-page__text text-muted">
+            The page you're looking for doesn't exist or has been moved.
+        </p>
+        
+        <div class="error-page__actions">
+            <a href="/" class="button button--primary">
+                <svg class="icon" aria-hidden="true"><use href="/static/icons/icons.svg#icon-home"></use></svg>
+                Go Home
+            </a>
+            <a href="/contact" class="button button--secondary">
+                Contact Me
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

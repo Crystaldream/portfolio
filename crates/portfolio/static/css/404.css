@@ -1,0 +1,22 @@
+/* 404 Page CSS */
+
+.error-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 60vh;
+}
+
+.error-page__title {
+  font-size: var(--text-2xl);
+  margin-bottom: var(--space-sm);
+}
+
+.error-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-sm);
+}

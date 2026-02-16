@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Contact | {{ site.author }}{% endblock %}
+{% block nav_contact %}nav__link--active{% endblock %}
+
+{% block styles %}{{ css|safe }}{% endblock %}
+
+{% block content %}
+<div class="page page--contact">
+
+    <header class="page-header" data-reveal>
+        <h1 class="page-header__title">Get in Touch</h1>
+        <p class="page-header__subtitle">Have a question or want to work together?</p>
+    </header>
+    
+    <div class="contact-grid">
+        <section class="contact-form-section" data-reveal data-reveal-delay="100">
+            {% include "partials/contact_form.html" %}
+        </section>
+        
+        <aside class="contact-info" data-reveal data-reveal-delay="200">
+            <div class="contact-info__section">
+                <h2 class="contact-info__title">Response Time</h2>
+                <p class="contact-info__text">I typically respond within 8 hours.</p>
+            </div>
+            
+            <div class="contact-info__section">
+                <h2 class="contact-info__title">Connect</h2>
+                <p class="contact-info__text">Find me on social media:</p>
+                
+                <nav class="contact-social" aria-label="Social links">
+                    {% for link in social_links %}
+                    <a 
+                        href="{{ link.url }}" 
+                        class="contact-social__link"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <span class="contact-social__icon">
+                            {% include "components/social_icon.html" %}
+                        </span>
+                        <span class="contact-social__name">{{ link.platform }}</span>
+                        <i class="fa-solid fa-arrow-right contact-social__arrow" aria-hidden="true"></i>
+                    </a>
+                    {% endfor %}
+                </nav>
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="mocha">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="{{ site.author }}">
+    <meta name="description" content="{% block description %}Telmo Reinas - Senior Software Developer specializing in Rust, web development, and modern architectures{% endblock %}">
+    <meta name="keywords" content="Telmo Reinas, Software Developer, Rust, Web Development, Portugal">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="{% block og_title %}{{ site.title }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Senior Software Developer{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ site.url }}{% block og_url %}{% endblock %}">
+    <meta property="og:image" content="{{ site.url }}/static/images/og-image.png">
+    <meta property="og:site_name" content="Telmo Reinas">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ site.title }}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Senior Software Developer{% endblock %}">
+    <meta name="twitter:image" content="{{ site.url }}/static/images/og-image.png">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ site.url }}{% block canonical %}{% endblock %}">
+    
+    <title>{% block title %}{{ site.author }}{{ site.portfolio }} {% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
+    
+    <!-- Preload critical fonts -->
+    <link rel="preload" href="/static/fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/static/fonts/JetBrainsMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/static/fonts/JetBrainsMono-Medium.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/static/fonts/JetBrainsMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin fetchpriority="high">
+
+    <style>
+        .show-loader .header,
+        .show-loader .main,
+        .show-loader .footer,
+        .show-loader .cursor-glow {
+            display: none !important;
+        }
+        .show-loader {
+            overflow: hidden;
+            background-color: #11111b;
+        }
+        #terminal-loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            background-color: #11111b;
+        }
+        .show-loader #terminal-loader {
+            display: flex;
+        }
+        #terminal-loader.terminal-loader--done {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease;
+        }
+        .terminal {
+            width: min(90vw, 700px);
+            background-color: #1e1e2e;
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid #313244;
+        }
+        .terminal__header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            background-color: #181825;
+            border-bottom: 1px solid #313244;
+        }
+        .terminal__buttons {
+            display: flex;
+            gap: 6px;
+        }
+        .terminal__btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .terminal__btn--red { background-color: #f38ba8; }
+        .terminal__btn--yellow { background-color: #f9e2af; }
+        .terminal__btn--green { background-color: #a6e3a1; }
+        .terminal__title {
+            flex: 1;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: #cdd6f4;
+        }
+        .terminal__body {
+            padding: 1rem;
+            min-height: 350px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        .terminal__output {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: #cdd6f4;
+        }
+        .terminal__line {
+            white-space: pre-wrap;
+            word-break: break-all;
+            min-height: 1.6em;
+        }
+        .terminal__prompt { color: #cdd6f4; }
+        .terminal__user { color: #6bcf6b; }
+        .terminal__host { color: #7ba4f7; }
+        .terminal__path { color: #b491f7; }
+        .terminal__command { color: #cdd6f4; }
+        .terminal__line--success { color: #a6e3a1; }
+        .terminal__line--info { color: #89b4fa; }
+        .terminal__line--highlight { color: #f9e2af; font-weight: 600; }
+        .terminal__cursor {
+            display: inline-block;
+            width: 8px;
+            height: 1.2em;
+            background-color: #cdd6f4;
+            animation: blink 1s step-end infinite;
+            vertical-align: text-bottom;
+            margin-left: 2px;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .theme-toggle__icon--dark {
+            display: none;
+        }
+        [data-theme="mocha"] .theme-toggle__icon--light,
+        [data-theme="frappe"] .theme-toggle__icon--light,
+        [data-theme="macchiato"] .theme-toggle__icon--light {
+            display: none;
+        }
+        [data-theme="mocha"] .theme-toggle__icon--dark,
+        [data-theme="frappe"] .theme-toggle__icon--dark,
+        [data-theme="macchiato"] .theme-toggle__icon--dark {
+            display: inline-block;
+        }
+        [data-theme="latte"] .theme-toggle__icon--light {
+            display: inline-block;
+        }
+        [data-theme="latte"] .theme-toggle__icon--dark {
+            display: none;
+        }
+        
+        /* SVG icon styles */
+        .icon {
+            width: 1em;
+            height: 1em;
+            fill: currentColor;
+            vertical-align: -0.125em;
+        }
+    </style>
+
+    <!-- Styles (inlined to eliminate render-blocking) -->
+    <style>{% block styles %}{% endblock %}</style>
+
+    <!-- HTMX -->
+    <script src="/static/js/htmx.min.js" defer></script>
+    
+    <!-- WASM module -->
+    <script type="module">
+        window.addEventListener('load', () => {
+            import('/wasm/wasm_components.js').then(m => m.default());
+        });
+    </script>
+    
+    <!-- Theme initialization -->
+    <script>
+        (function() {
+            var stored = localStorage.getItem('theme');
+            var preferred = window.matchMedia('(prefers-color-scheme: light)').matches ? 'latte' : 'mocha';
+            document.documentElement.setAttribute('data-theme', stored || preferred);
+        })();
+    </script>
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Telmo Reinas",
+      "url": "https://telmoreinas.dev",
+      "jobTitle": "Senior Software Developer",
+      "sameAs": [
+        "https://github.com/telmoreinas",
+        "https://linkedin.com/in/telmoreinas"
+      ]
+    }
+    </script>
+    
+    {% block head %}{% endblock %}
+</head>
+<body class="layout">
+
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main" class="skip-link">Skip to main content</a>
+
+    <div id="terminal-loader" class="terminal-loader">
+        <div class="terminal">
+            <div class="terminal__header">
+                <div class="terminal__buttons">
+                    <span class="terminal__btn terminal__btn--red"></span>
+                    <span class="terminal__btn terminal__btn--yellow"></span>
+                    <span class="terminal__btn terminal__btn--green"></span>
+                </div>
+                <span class="terminal__title">portfolio — bash</span>
+            </div>
+            <div class="terminal__body">
+                <div id="terminal-output" class="terminal__output"></div>
+                <div class="terminal__cursor"></div>
+            </div>
+        </div>
+    </div>
+    
+    <header class="header">
+        <div class="header__container">
+            <a href="/" class="header__logo" aria-label="Home">
+                <span class="header__logo-text">{{ site.author }}</span>
+            </a>
+            
+            <nav class="nav" id="main-nav" aria-label="Main navigation">
+                <ul class="nav__list">
+                    <li class="nav__item">
+                        <a href="/" class="nav__link {% block nav_home %}{% endblock %}">Home</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="/about" class="nav__link {% block nav_about %}{% endblock %}">About</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="/projects" class="nav__link {% block nav_projects %}{% endblock %}">Projects</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="/contact" class="nav__link {% block nav_contact %}{% endblock %}">Contact</a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="header__actions">
+                <button 
+                    class="theme-toggle" 
+                    aria-label="Toggle theme"
+                    id="theme-toggle"
+                >
+                    <svg class="icon theme-toggle__icon theme-toggle__icon--light" aria-hidden="true"><use href="/static/icons/icons.svg#icon-sun"></use></svg>
+                    <svg class="icon theme-toggle__icon theme-toggle__icon--dark" aria-hidden="true"><use href="/static/icons/icons.svg#icon-moon"></use></svg>
+                </button>
+                
+                <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+                    <span class="nav-toggle__bar"></span>
+                    <span class="nav-toggle__bar"></span>
+                    <span class="nav-toggle__bar"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <main id="main" class="main">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer class="footer">
+        <div class="footer__container">
+            <div class="footer__content">
+                <p class="footer__copyright">
+                    &copy; <span id="year"></span> {{ site.author }}. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+        
+    {% block scripts %}{% endblock %}
+
+    <script>
+    (function() {
+        // Set year
+        var yearEl = document.getElementById('year');
+        if (yearEl) yearEl.textContent = new Date().getFullYear();
+        
+        // Check if should show animation: only on homepage AND first visit this session
+        var isHomepage = window.location.pathname === '/';
+        var hasSeenAnimation = sessionStorage.getItem('terminal-animation-seen');
+        
+        if (!isHomepage || hasSeenAnimation) {
+            return; // Don't show animation
+        }
+        
+        // Show animation
+        document.body.classList.add('show-loader');
+        sessionStorage.setItem('terminal-animation-seen', 'true');
+        
+        var loader = document.getElementById('terminal-loader');
+        var output = document.getElementById('terminal-output');
+        
+        var lines = [
+            { type: 'input', text: 'cd portfolio', delay: 80 },
+            { type: 'input', text: 'docker-compose up --build', delay: 60 },
+            { type: 'output', text: '[+] Building 2.3s (12/12) FINISHED', delay: 0 },
+            { type: 'output', text: ' => [internal] load build definition from Dockerfile', delay: 0 },
+            { type: 'output', text: ' => [internal] load .dockerignore', delay: 0 },
+            { type: 'output', text: ' => [internal] load metadata for rust:latest', delay: 0 },
+            { type: 'output', text: ' => [base 1/3] FROM rust:latest', delay: 0 },
+            { type: 'output', text: ' => [base 2/3] RUN apt-get update && apt-get install -y pkg-config', delay: 0 },
+            { type: 'output', text: ' => [base 3/3] WORKDIR /app', delay: 0 },
+            { type: 'output', text: ' => [build 1/4] COPY Cargo.toml Cargo.lock ./', delay: 0 },
+            { type: 'output', text: ' => [build 2/4] COPY crates ./crates', delay: 0 },
+            { type: 'output', text: ' => [build 3/4] RUN cargo build --release', delay: 0 },
+            { type: 'success', text: ' => CACHED [build 4/4] compiled successfully ✓', delay: 0 },
+            { type: 'output', text: '', delay: 0 },
+            { type: 'output', text: '[+] Running', delay: 0 },
+            { type: 'success', text: ' ✔ Container portfolio  ::  Started', delay: 0 },
+            { type: 'output', text: '', delay: 0 },
+            { type: 'info', text: 'INFO portfolio: Configuration loaded host=0.0.0.0 port=3000', delay: 0 },
+            { type: 'info', text: 'INFO shared::db: Connecting to SurrealDB', delay: 0 },
+            { type: 'success', text: 'INFO shared::db: Connected successfully ✓', delay: 0 },
+            { type: 'info', text: 'INFO shared::db: Initializing schema...', delay: 0 },
+            { type: 'success', text: 'INFO shared::db: Schema initialized ✓', delay: 0 },
+            { type: 'output', text: '', delay: 0 },
+            { type: 'highlight', text: 'Server running at http://telmoreinas.dev', delay: 0 },
+            { type: 'output', text: '', delay: 0 },
+        ];
+        
+        var lineIndex = 0;
+        var charIndex = 0;
+        var currentLine = null;
+        
+        function getPrompt() {
+            return '<span class="terminal__prompt"><span class="terminal__user">guest</span>@<span class="terminal__host">portfolio</span>:<span class="terminal__path">~</span>$ </span>';
+        }
+        
+        function typeChar() {
+            if (lineIndex >= lines.length) {
+                setTimeout(hideLoader, 400);
+                return;
+            }
+            
+            var line = lines[lineIndex];
+            
+            if (charIndex === 0) {
+                currentLine = document.createElement('div');
+                currentLine.className = 'terminal__line';
+                
+                if (line.type === 'input') {
+                    currentLine.innerHTML = getPrompt();
+                    currentLine.classList.add('terminal__line--input');
+                } else if (line.type === 'success') {
+                    currentLine.classList.add('terminal__line--success');
+                } else if (line.type === 'info') {
+                    currentLine.classList.add('terminal__line--info');
+                } else if (line.type === 'highlight') {
+                    currentLine.classList.add('terminal__line--highlight');
+                }
+                
+                output.appendChild(currentLine);
+                output.scrollTop = output.scrollHeight;
+            }
+            
+            if (line.type === 'input' && charIndex < line.text.length) {
+                currentLine.innerHTML = getPrompt() + '<span class="terminal__command">' + line.text.substring(0, charIndex + 1) + '</span>';
+                charIndex++;
+                setTimeout(typeChar, line.delay + Math.random() * 40);
+            } else if (line.type === 'input') {
+                charIndex = 0;
+                lineIndex++;
+                setTimeout(typeChar, 300);
+            } else {
+                currentLine.innerHTML += line.text;
+                charIndex = 0;
+                lineIndex++;
+                setTimeout(typeChar, 80 + Math.random() * 60);
+            }
+        }
+        
+        function hideLoader() {
+            loader.classList.add('terminal-loader--done');
+            document.body.classList.remove('show-loader');
+            setTimeout(function() {
+                loader.style.display = 'none';
+            }, 600);
+        }
+        
+        setTimeout(typeChar, 500);
+    })();
+    </script>
+
+    <script>
+    (function() {
+        // Reveal animation using IntersectionObserver (no forced reflows)
+        var reveals = document.querySelectorAll('[data-reveal]');
+        
+        if ('IntersectionObserver' in window) {
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('revealed');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0,
+                rootMargin: '-50px'
+            });
+            
+            reveals.forEach(function(el) {
+                observer.observe(el);
+            });
+        } else {
+            // Fallback for old browsers
+            reveals.forEach(function(el) {
+                el.classList.add('revealed');
+            });
+        }
+    })();
+    </script>
+
+    <script>
+    (function() {
+        // Mobile nav toggle
+        var navToggle = document.getElementById('nav-toggle');
+        var nav = document.getElementById('main-nav');
+        var scrollPos = 0;
+        
+        if (navToggle && nav) {
+            navToggle.addEventListener('click', function() {
+                var isOpen = nav.classList.contains('is-open');
+                
+                if (!isOpen) {
+                    scrollPos = window.pageYOffset;
+                    document.body.style.position = 'fixed';
+                    document.body.style.top = '-' + scrollPos + 'px';
+                    document.body.style.width = '100%';
+                    nav.classList.add('is-open');
+                } else {
+                    document.body.style.position = '';
+                    document.body.style.top = '';
+                    document.body.style.width = '';
+                    window.scrollTo(0, scrollPos);
+                    nav.classList.remove('is-open');
+                }
+                
+                navToggle.setAttribute('aria-expanded', !isOpen ? 'true' : 'false');
+            });
+        }
+        
+        // Theme toggle
+        var themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', function() {
+                var current = document.documentElement.getAttribute('data-theme');
+                var next = current === 'mocha' ? 'latte' : 'mocha';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+            });
+        }
+    })();
+    </script>
+
+    <script>
+    (function() {
+        var cursor = document.querySelector('.cursor-glow');
+        if (cursor && window.innerWidth > 768) {
+            document.addEventListener('mousemove', function(e) {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+            });
+        }
+    })();
+    </script>
+
+    <div class="cursor-glow" aria-hidden="true"></div>
+
+</body>
+</html>

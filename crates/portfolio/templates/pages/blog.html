@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Blog | {{ site.author }}{% endblock %}
+{% block nav_blog %}nav__link--active{% endblock %}
+
+{% block styles %}{{ css|safe }}{% endblock %}
+
+{% block content %}
+<div class="page page--blog">
+
+    <header class="page-header" data-reveal>
+        <h1 class="page-header__title">Blog</h1>
+        <p class="page-header__subtitle">Thoughts, tutorials, and more</p>
+    </header>
+    
+    {% if !tags.is_empty() %}
+    <nav class="tag-filter" aria-label="Filter by tag" data-reveal data-reveal-delay="100">
+        <button 
+            class="tag-filter__button tag-filter__button--active"
+            hx-get="/htmx/posts"
+            hx-target="#posts-list"
+            hx-swap="innerHTML"
+        >
+            All
+        </button>
+        {% for tag in tags %}
+        <button 
+            class="tag-filter__button"
+            hx-get="/htmx/posts/filter?tag={{ tag }}"
+            hx-target="#posts-list"
+            hx-swap="innerHTML"
+        >
+            {{ tag }}
+        </button>
+        {% endfor %}
+    </nav>
+    {% endif %}
+    
+
+    <section class="section section--posts-list" aria-labelledby="posts-list-heading">
+        <h2 id="posts-list-heading" class="sr-only">Blog Posts</h2>
+        
+        <div id="posts-list" class="posts-list">
+            {% for post in posts %}
+            <article class="post-item" data-reveal data-reveal-delay="{{ loop.index * 50 }}">
+                <div class="post-item__meta">
+                    <time datetime="{{ post.created_at }}">
+                        {{ post.created_at.format("%B %d, %Y") }}
+                    </time>
+                    <span class="post-item__separator">·</span>
+                    <span class="post-item__reading-time">{{ post.reading_time }} min read</span>
+                </div>
+                
+                <h3 class="post-item__title">
+                    <a href="/blog/{{ post.slug }}">{{ post.title }}</a>
+                </h3>
+                
+                <p class="post-item__excerpt">{{ post.excerpt }}</p>
+                
+                <div class="post-item__tags">
+                    {% for tag in post.tags %}
+                    <span class="tag tag--small">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                
+                <a href="/blog/{{ post.slug }}" class="post-item__link">
+                    Read More
+                    <svg class="icon" aria-hidden="true"><use href="/static/icons/icons.svg#icon-arrow-right"></use></svg>
+                </a>
+            </article>
+            {% endfor %}
+        </div>
+        
+        {% if posts.is_empty() %}
+        <div class="empty-state" data-reveal>
+            <svg class="icon" aria-hidden="true" style="font-size: 3rem;"><use href="/static/icons/icons.svg#icon-pen-to-square"></use></svg>
+            <h2>No Posts Yet</h2>
+            <p>Check back soon for new content!</p>
+        </div>
+        {% endif %}
+    </section>
+    
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.querySelectorAll('.tag-filter__button').forEach(button => {
+        button.addEventListener('click', () => {
+            document.querySelectorAll('.tag-filter__button').forEach(b => 
+                b.classList.remove('tag-filter__button--active')
+            );
+            button.classList.add('tag-filter__button--active');
+        });
+    });
+</script>
+{% endblock %}

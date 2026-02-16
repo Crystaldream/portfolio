@@ -1,0 +1,19 @@
+<article class="project-card">
+    {% if project.image_url.is_some() %}
+    <div class="project-card__image">
+        <img src="{{ project.image_url.as_ref().unwrap() }}" alt="{{ project.title }}" loading="lazy">
+    </div>
+    {% endif %}
+    <div class="project-card__content">
+        <h3 class="project-card__title">{{ project.title }}</h3>
+        <p class="project-card__description">{{ project.description }}</p>
+        <div class="project-card__tech">
+            {% for tech in project.tech_stack %}
+            <span class="tag">{{ tech }}</span>
+            {% endfor %}
+        </div>
+        <a href="/projects/{{ project.slug }}" class="project-card__link">
+            Learn More →
+        </a>
+    </div>
+</article>

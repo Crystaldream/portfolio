@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Projects | {{ site.author }}{% endblock %}
+{% block nav_projects %}nav__link--active{% endblock %}
+
+{% block styles %}{{ css|safe }}{% endblock %}
+
+{% block content %}
+<div class="page page--projects">
+
+    <header class="page-header" data-reveal>
+        <h1 class="page-header__title">Projects</h1>
+        <p class="page-header__subtitle">Things I've built</p>
+    </header>
+    
+    <div class="projects-grid">
+        {% for project in projects %}
+        <article class="project-card" data-reveal data-reveal-delay="{{ loop.index * 100 }}">
+            <div class="project-card__image">
+                {% if project.image_url.is_some() %}
+                <img src="{{ project.image_url.as_ref().unwrap() }}" alt="{{ project.title }}" loading="lazy">
+                {% else %}
+                <div class="project-card__placeholder">
+                    <svg class="icon" aria-hidden="true"><use href="/static/icons/icons.svg#icon-code"></use></svg>
+                </div>
+                {% endif %}
+            </div>
+            <div class="project-card__content">
+                <h3 class="project-card__title">{{ project.title }}</h3>
+                <p class="project-card__description">{{ project.description }}</p>
+                <div class="project-card__tech">
+                    {% for tech in project.tech_stack %}
+                    <span class="tag">{{ tech }}</span>
+                    {% endfor %}
+                </div>
+                <a href="/projects/{{ project.slug }}" class="project-card__link">
+                    Learn More →
+                </a>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    
+    {% if projects.is_empty() %}
+    <div class="empty-state" data-reveal>
+        <p>No projects yet. Check back soon!</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

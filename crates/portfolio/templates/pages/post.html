@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} | {{ site.title }}{% endblock %}
+{% block nav_blog %}nav__link--active{% endblock %}
+
+{% block styles %}{{ css|safe }}{% endblock %}
+
+{% block content %}
+<div class="page page--post">
+
+    <nav class="breadcrumb" aria-label="Breadcrumb" data-reveal>
+        <a href="/blog" class="breadcrumb__link">
+            <svg class="icon" aria-hidden="true"><use href="/static/icons/icons.svg#icon-arrow-left"></use></svg>
+            Back to Blog
+        </a>
+    </nav>
+    
+    <article class="article">
+        <header class="article__header" data-reveal data-reveal-delay="100">
+            <div class="article__meta">
+                <time datetime="{{ post.created_at }}">
+                    {{ post.created_at.format("%B %d, %Y") }}
+                </time>
+                <span class="article__separator">·</span>
+                <span>{{ post.reading_time }} min read</span>
+            </div>
+            
+            <h1 class="article__title">{{ post.title }}</h1>
+            
+            <div class="article__tags">
+                {% for tag in post.tags %}
+                <span class="tag">{{ tag }}</span>
+                {% endfor %}
+            </div>
+        </header>
+        
+        <div class="article__content prose" data-reveal data-reveal-delay="200">
+            {{ post.content_html|safe }}
+        </div>
+        
+        <footer class="article__footer" data-reveal>
+            <div class="article__share">
+                <span class="article__share-label">Share this post:</span>
+                <div class="article__share-links">
+                    <a 
+                        href="https://twitter.com/intent/tweet?text={{ post.title }}&url={{ site.url }}/blog/{{ post.slug }}" 
+                        class="article__share-link"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Share on Twitter"
+                    >
+                        <svg class="icon" aria-hidden="true"><use href="/static/icons/icons.svg#icon-twitter"></use></svg>
+                    </a>
+                    <a 
+                        href="https://www.linkedin.com/shareArticle?mini=true&url={{ site.url }}/blog/{{ post.slug }}&title={{ post.title }}" 
+                        class="article__share-link"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Share on LinkedIn"
+                    >
+                        <svg class="icon" aria-hidden="true"><use href="/static/icons/icons.svg#icon-linkedin"></use></svg>
+                    </a>
+                    <button 
+                        class="article__share-link"
+                        onclick="navigator.clipboard.writeText('{{ site.url }}/blog/{{ post.slug }}'); this.classList.add('copied');"
+                        aria-label="Copy link"
+                    >
+                        <svg class="icon" aria-hidden="true"><use href="/static/icons/icons.svg#icon-link"></use></svg>
+                    </button>
+                </div>
+            </div>
+            
+            <nav class="article__nav">
+                <a href="/blog" class="button button--ghost">
+                    <svg class="icon" aria-hidden="true"><use href="/static/icons/icons.svg#icon-arrow-left"></use></svg>
+                    All Posts
+                </a>
+            </nav>
+        </footer>
+    </article>
+</div>
+{% endblock %}

@@ -1,0 +1,5 @@
+target/
+.env
+*.db
+portfolio.db/
+Cargo.lock

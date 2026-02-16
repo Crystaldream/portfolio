@@ -1,0 +1,3 @@
+Contact: mailto:telmo.reinas@gmail.com
+Preferred-Languages: en, pt, es
+Canonical: https://telmoreinas.dev/.well-known/security.txt
